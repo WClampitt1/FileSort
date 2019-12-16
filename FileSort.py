@@ -3,6 +3,7 @@
 import sys
 import os
 import shutil
+from progress.bar import Bar
 
 
 def main(argv):
@@ -31,17 +32,20 @@ def check(infile, outfile):
 # Sorts the files from the input directory into folders in the output directory
 # that correspond to the file extension of the files
 def sort(infile, outfile):
-    for (root, dirs, files) in os.walk(infile):
-        for file in files:
-            full_name = os.path.join(root, file)
-            file_ext = os.path.splitext(full_name)[1]
-            target = os.path.join(outfile, file_ext[1:])
-            if not (os.path.exists(target) and os.path.isdir(target)):
-                os.mkdir(target)
-            try:
-                shutil.copy(full_name, target)
-            except IOError as e:
-                print("Unable to copy file. %s" % e)
+    numfiles = sum([len(files) for r, d, files in os.walk(infile)])
+    with Bar('Sorting Files', max=numfiles) as bar:
+        for (root, dirs, files) in os.walk(infile):
+            for file in files:
+                full_name = os.path.join(root, file)
+                file_ext = os.path.splitext(full_name)[1]
+                target = os.path.join(outfile, file_ext[1:])
+                if not (os.path.exists(target) and os.path.isdir(target)):
+                    os.mkdir(target)
+                try:
+                    shutil.copy(full_name, target)
+                except IOError as e:
+                    print("Unable to copy file. %s" % e)
+                bar.next()
 
 
 if __name__ == "__main__":

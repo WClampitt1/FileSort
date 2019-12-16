@@ -1,0 +1,5 @@
+# Don't track the contents of these folders
+sortedfiles/
+testfiles/
+venv/
+makefiles.py
